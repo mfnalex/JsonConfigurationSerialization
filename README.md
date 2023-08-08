@@ -33,8 +33,6 @@ String serialized = gson.toJson(someItemStack);
 ItemStack deserialized = gson.fromJson(serialized, ItemStack.class);
 ```
 
-```java
-
 # Dependency
 ### Repository
 ```xml
