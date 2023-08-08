@@ -1,14 +1,11 @@
 package com.jeff_media.jsonconfigurationserialization;
 
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
-import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,31 +15,20 @@ import java.util.Map;
 public final class JsonConfigurationSerialization {
 
     private static final Gson GSON = new Gson();
-    private static final TypeToken<Map<String,Object>> MAP_TYPE = new TypeToken<Map<String,Object>>() {};
-
-    /**
-     * Gson TypeAdapter for ConfigurationSerializables
-     * @deprecated
-     */
-    @Deprecated
-    public static final TypeAdapter<ConfigurationSerializable> ADAPTER = new TypeAdapter<ConfigurationSerializable>() {
-        @Override
-        public void write(JsonWriter out, ConfigurationSerializable value) throws IOException {
-            out.jsonValue(serialize(value));
-        }
-
-        @Override
-        public ConfigurationSerializable read(JsonReader in) throws IOException {
-            return deserialize(in.toString());
-        }
+    private static final TypeToken<Map<String, Object>> MAP_TYPE = new TypeToken<Map<String, Object>>() {
     };
+
+    public static final JsonConfigurationSerializationAdapter ADAPTER = new JsonConfigurationSerializationAdapter();
 
     private JsonConfigurationSerialization() {
         throw new IllegalStateException("Utility class");
     }
 
+    ;
+
     /**
      * Serializes a ConfigurationSerializable to a Json String
+     *
      * @param serializable ConfigurationSerializable to serialize
      * @return Json String
      */
@@ -50,18 +36,18 @@ public final class JsonConfigurationSerialization {
         return GSON.toJson(serializeToMap(serializable), MAP_TYPE.getType());
     }
 
-    private static Map<String,Object> serializeToMap(ConfigurationSerializable serializable) {
-        Map<String,Object> map = new HashMap<>(serializable.serialize());
-        map.put("==", ConfigurationSerialization.getAlias(serializable.getClass()));
+    private static Map<String, Object> serializeToMap(ConfigurationSerializable serializable) {
+        Map<String, Object> map = new HashMap<>(serializable.serialize());
+        map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
         serializeInner(map);
         return map;
     }
 
-    private static void serializeInner(Map<String,Object> map) {
-        for(Map.Entry<String,Object> entry : map.entrySet()) {
-            if(entry.getValue() instanceof ConfigurationSerializable) {
-                Map<String,Object> innerMap = new HashMap<>(((ConfigurationSerializable) entry.getValue()).serialize());
-                innerMap.put("==", ConfigurationSerialization.getAlias((Class<? extends ConfigurationSerializable>) entry.getValue().getClass()));
+    private static void serializeInner(Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (entry.getValue() instanceof ConfigurationSerializable) {
+                Map<String, Object> innerMap = new HashMap<>(((ConfigurationSerializable) entry.getValue()).serialize());
+                innerMap.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias((Class<? extends ConfigurationSerializable>) entry.getValue().getClass()));
                 serializeInner(innerMap);
                 entry.setValue(innerMap);
             }
@@ -70,8 +56,9 @@ public final class JsonConfigurationSerialization {
 
     /**
      * Deserializes a ConfigurationSerializable from a Json String
+     *
      * @param json Json String
-     * @return ConfigurationSerializable
+     * @return deserialized ConfigurationSerializable
      * @throws IllegalArgumentException if the Json String is invalid or if the ConfigurationSerializable class is not found
      */
     public static ConfigurationSerializable deserialize(String json) throws IllegalArgumentException {
@@ -84,14 +71,32 @@ public final class JsonConfigurationSerialization {
         }
     }
 
+    static ConfigurationSerializable deserializeFromMap(Map<String, Object> map) throws IllegalArgumentException {
+        deserializeInner(map);
+        return ConfigurationSerialization.deserializeObject(map);
+    }
+
+    /**
+     * Deserializes a ConfigurationSerializable from a Json String
+     *
+     * @param json  Json String
+     * @param clazz Class of the ConfigurationSerializable
+     * @return deserialized ConfigurationSerializable
+     * @throws IllegalArgumentException if the Json String is invalid or if the ConfigurationSerializable class is not found
+     * @throws ClassCastException       if the ConfigurationSerializable is not of the specified class
+     */
+    public static <T extends ConfigurationSerializable> T deserialize(String json, Class<T> clazz) throws IllegalArgumentException, ClassCastException {
+        return clazz.cast(deserialize(json));
+    }
+
     private static void deserializeInner(Map<String, Object> map) {
-        for(Map.Entry<String,Object> entry : map.entrySet()) {
-            if(entry.getValue() instanceof Map) {
-                Map<String,Object> innerMap = (Map<String, Object>) entry.getValue();
-                if(innerMap.containsKey("==")) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (entry.getValue() instanceof Map) {
+                Map<String, Object> innerMap = (Map<String, Object>) entry.getValue();
+                if (innerMap.containsKey(ConfigurationSerialization.SERIALIZED_TYPE_KEY)) {
                     String alias = (String) innerMap.get("==");
                     Class<? extends ConfigurationSerializable> clazz = ConfigurationSerialization.getClassByAlias(alias);
-                    if(clazz != null) {
+                    if (clazz != null) {
                         deserializeInner(innerMap);
                         ConfigurationSerializable serializable = ConfigurationSerialization.deserializeObject(innerMap, clazz);
                         entry.setValue(serializable);
@@ -100,6 +105,18 @@ public final class JsonConfigurationSerialization {
                     }
                 }
             }
+        }
+    }
+
+    public static final class JsonConfigurationSerializationAdapter implements JsonSerializer<ConfigurationSerializable>, JsonDeserializer<ConfigurationSerializable> {
+        @Override
+        public JsonElement serialize(ConfigurationSerializable configurationSerializable, Type type, JsonSerializationContext jsonSerializationContext) {
+            return jsonSerializationContext.serialize(serializeToMap(configurationSerializable), MAP_TYPE.getType());
+        }
+
+        @Override
+        public ConfigurationSerializable deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            return deserializeFromMap(jsonDeserializationContext.deserialize(jsonElement, MAP_TYPE.getType()));
         }
     }
 
