@@ -13,7 +13,7 @@
 </p>
 <!--- Buttons end -->
 
-Simple library to serialize and deserialize Spigot's ConfigurationSerializable objects to and from JSON.
+Simple library to serialize and deserialize Spigot's ConfigurationSerializable objects to and from JSON. Compatible with all Spigot versions.
 
 ### Repository
 ```xml
@@ -34,3 +34,6 @@ Simple library to serialize and deserialize Spigot's ConfigurationSerializable o
 ```
 
 [Must be shaded into your plugin jar.](https://blog.jeff-media.com/common-maven-questions/)
+
+# Note for ancient Spigot versions
+If your version of Spigot does not provide Gson on its classpath, you need to shade a compatible version of it yourself (e.g. com.google.code.gson:gson:2.10.1)

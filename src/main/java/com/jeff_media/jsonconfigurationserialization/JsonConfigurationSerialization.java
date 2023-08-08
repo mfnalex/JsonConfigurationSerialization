@@ -1,17 +1,41 @@
 package com.jeff_media.jsonconfigurationserialization;
 
 import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility class for serializing and deserializing ConfigurationSerializables to and from Json
+ */
 public final class JsonConfigurationSerialization {
 
     private static final Gson GSON = new Gson();
     private static final TypeToken<Map<String,Object>> MAP_TYPE = new TypeToken<Map<String,Object>>() {};
+
+    /**
+     * Gson TypeAdapter for ConfigurationSerializables
+     * @deprecated
+     */
+    @Deprecated
+    public static final TypeAdapter<ConfigurationSerializable> ADAPTER = new TypeAdapter<ConfigurationSerializable>() {
+        @Override
+        public void write(JsonWriter out, ConfigurationSerializable value) throws IOException {
+            out.jsonValue(serialize(value));
+        }
+
+        @Override
+        public ConfigurationSerializable read(JsonReader in) throws IOException {
+            return deserialize(in.toString());
+        }
+    };
 
     private JsonConfigurationSerialization() {
         throw new IllegalStateException("Utility class");
@@ -22,7 +46,11 @@ public final class JsonConfigurationSerialization {
      * @param serializable ConfigurationSerializable to serialize
      * @return Json String
      */
-    public static Map<String,Object> serialize(ConfigurationSerializable serializable) {
+    public static String serialize(ConfigurationSerializable serializable) {
+        return GSON.toJson(serializeToMap(serializable), MAP_TYPE.getType());
+    }
+
+    private static Map<String,Object> serializeToMap(ConfigurationSerializable serializable) {
         Map<String,Object> map = new HashMap<>(serializable.serialize());
         map.put("==", ConfigurationSerialization.getAlias(serializable.getClass()));
         serializeInner(map);
