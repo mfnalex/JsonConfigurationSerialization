@@ -14,17 +14,17 @@ import java.util.Map;
  */
 public final class JsonConfigurationSerialization {
 
+    /**
+     * A {@link JsonSerializer} and {@link JsonDeserializer} for {@link ConfigurationSerializable}s to be used with {@link GsonBuilder#registerTypeHierarchyAdapter(Class, Object)}
+     */
+    public static final ConfigurationSerializableTypeHierarchyAdapter TYPE_HIERARCHY_ADAPTER = new ConfigurationSerializableTypeHierarchyAdapter();
     private static final Gson GSON = new Gson();
-    private static final TypeToken<Map<String, Object>> MAP_TYPE = new TypeToken<Map<String, Object>>() {
+    static final TypeToken<Map<String, Object>> MAP_TYPE = new TypeToken<Map<String, Object>>() {
     };
-
-    public static final JsonConfigurationSerializationAdapter ADAPTER = new JsonConfigurationSerializationAdapter();
 
     private JsonConfigurationSerialization() {
         throw new IllegalStateException("Utility class");
     }
-
-    ;
 
     /**
      * Serializes a ConfigurationSerializable to a Json String
@@ -36,7 +36,7 @@ public final class JsonConfigurationSerialization {
         return GSON.toJson(serializeToMap(serializable), MAP_TYPE.getType());
     }
 
-    private static Map<String, Object> serializeToMap(ConfigurationSerializable serializable) {
+    static Map<String, Object> serializeToMap(ConfigurationSerializable serializable) {
         Map<String, Object> map = new HashMap<>(serializable.serialize());
         map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
         serializeInner(map);
@@ -108,16 +108,6 @@ public final class JsonConfigurationSerialization {
         }
     }
 
-    public static final class JsonConfigurationSerializationAdapter implements JsonSerializer<ConfigurationSerializable>, JsonDeserializer<ConfigurationSerializable> {
-        @Override
-        public JsonElement serialize(ConfigurationSerializable configurationSerializable, Type type, JsonSerializationContext jsonSerializationContext) {
-            return jsonSerializationContext.serialize(serializeToMap(configurationSerializable), MAP_TYPE.getType());
-        }
 
-        @Override
-        public ConfigurationSerializable deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return deserializeFromMap(jsonDeserializationContext.deserialize(jsonElement, MAP_TYPE.getType()));
-        }
-    }
 
 }
