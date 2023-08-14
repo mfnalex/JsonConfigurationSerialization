@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public final class ConfigurationSerializableTypeHierarchyAdapter implements JsonSerializer<ConfigurationSerializable>, JsonDeserializer<ConfigurationSerializable> {
 
+    private static final String SERIALIZED_TYPE_KEY = ConfigurationSerialization.SERIALIZED_TYPE_KEY;
     static final TypeToken<Map<String, Object>> MAP_TYPE = new TypeToken<Map<String, Object>>() {
     };
 
@@ -24,7 +25,7 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
 
     static Map<String, Object> serializeToMap(ConfigurationSerializable serializable) {
         Map<String, Object> map = new HashMap<>(serializable.serialize());
-        map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
+        map.put(SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
         serializeInner(map);
         return map;
     }
@@ -33,7 +34,7 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof ConfigurationSerializable) {
                 Map<String, Object> innerMap = new HashMap<>(((ConfigurationSerializable) entry.getValue()).serialize());
-                innerMap.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias((Class<? extends ConfigurationSerializable>) entry.getValue().getClass()));
+                innerMap.put(SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias((Class<? extends ConfigurationSerializable>) entry.getValue().getClass()));
                 serializeInner(innerMap);
                 entry.setValue(innerMap);
             }
@@ -44,8 +45,8 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof Map) {
                 Map<String, Object> innerMap = (Map<String, Object>) entry.getValue();
-                if (innerMap.containsKey(ConfigurationSerialization.SERIALIZED_TYPE_KEY)) {
-                    String alias = (String) innerMap.get("==");
+                if (innerMap.containsKey(SERIALIZED_TYPE_KEY)) {
+                    String alias = (String) innerMap.get(SERIALIZED_TYPE_KEY);
                     Class<? extends ConfigurationSerializable> clazz = ConfigurationSerialization.getClassByAlias(alias);
                     if (clazz != null) {
                         deserializeInner(innerMap);
