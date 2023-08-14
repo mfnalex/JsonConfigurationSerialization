@@ -33,17 +33,8 @@ String serialized = gson.toJson(someItemStack);
 ItemStack deserialized = gson.fromJson(serialized, ItemStack.class);
 ```
 
-# Dependency
-### Repository
-```xml
-<repository>
-    <id>jeff-media-public</id>
-    <name>JEFF Media GbR Repository</name>
-    <url>https://repo.jeff-media.com/public</url>
-</repository>
-```
-
-### Dependency
+# Maven dependency
+The dependency is available on Maven Central:
 ```xml
 <dependency>
   <groupId>com.jeff-media</groupId>
