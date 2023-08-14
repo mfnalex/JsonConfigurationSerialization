@@ -43,17 +43,32 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
 
     private static void deserializeInner(Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (entry.getValue() instanceof Map) {
-                Map<String, Object> innerMap = (Map<String, Object>) entry.getValue();
+
+            Object raw = entry.getValue();
+
+            if (raw instanceof Map) {
+                Map<String, Object> innerMap = (Map<String, Object>) raw;
+                deserializeInner(innerMap);
                 if (innerMap.containsKey(SERIALIZED_TYPE_KEY)) {
                     String alias = (String) innerMap.get(SERIALIZED_TYPE_KEY);
                     Class<? extends ConfigurationSerializable> clazz = ConfigurationSerialization.getClassByAlias(alias);
                     if (clazz != null) {
-                        deserializeInner(innerMap);
                         ConfigurationSerializable serializable = ConfigurationSerialization.deserializeObject(innerMap, clazz);
                         entry.setValue(serializable);
                     } else {
                         throw new IllegalArgumentException("Could not find class by alias: " + alias);
+                    }
+                }
+            } else {
+                // Gson is pretty stupid and deserializes all numbers as doubles, so we need to convert them back to ints if possible.
+                // Otherwise, certain deserialization methods will not work, for example CraftMetaItem#buildEnchantments does an instanceof Integer check
+                if(raw instanceof Number) {
+                    Number number = (Number) raw;
+                    double asDouble = number.doubleValue();
+                    int asInt = number.intValue();
+                    double intAsDouble = asInt;
+                    if(asDouble == intAsDouble) {
+                        entry.setValue(asInt);
                     }
                 }
             }

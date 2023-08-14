@@ -1,7 +1,7 @@
 # JSON Serializer/Deserializer for Spigot's ConfigurationSerializable
 <!--- Buttons start -->
 <p align="center">
-  <a href="https://hub.jeff-media.com/javadocs/com/jeff-media/json-configuration-serialization/1.1.1">
+  <a href="https://hub.jeff-media.com/javadocs/com/jeff-media/json-configuration-serialization/1.1.2">
     <img src="https://static.jeff-media.com/img/button_javadocs.png?3" alt="Javadocs">
   </a>
   <a href="https://discord.jeff-media.com/">
@@ -39,7 +39,7 @@ The dependency is available on Maven Central:
 <dependency>
   <groupId>com.jeff-media</groupId>
   <artifactId>json-configuration-serialization</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
 </dependency>
 ```
 
