@@ -1,7 +1,7 @@
 # JSON Serializer/Deserializer for Spigot's ConfigurationSerializable
 <!--- Buttons start -->
 <p align="center">
-  <a href="https://repo.jeff-media.com/javadoc/public/com/jeff-media/JsonConfigurationSerialization/1.1-SNAPSHOT">
+  <a href="https://repo.jeff-media.com/javadoc/public/com/jeff-media/JsonConfigurationSerialization/1.1">
     <img src="https://static.jeff-media.com/img/button_javadocs.png?3" alt="Javadocs">
   </a>
   <a href="https://discord.jeff-media.com/">
@@ -47,8 +47,8 @@ ItemStack deserialized = gson.fromJson(serialized, ItemStack.class);
 ```xml
 <dependency>
   <groupId>com.jeff-media</groupId>
-  <artifactId>JsonConfigurationSerialization</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <artifactId>json-configuration-serialization</artifactId>
+  <version>1.1</version>
 </dependency>
 ```
 

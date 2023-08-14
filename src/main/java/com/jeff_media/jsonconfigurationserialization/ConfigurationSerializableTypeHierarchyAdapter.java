@@ -22,16 +22,6 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
         return ConfigurationSerialization.deserializeObject(map);
     }
 
-    @Override
-    public JsonElement serialize(ConfigurationSerializable configurationSerializable, Type type, JsonSerializationContext jsonSerializationContext) {
-        return jsonSerializationContext.serialize(serializeToMap(configurationSerializable), MAP_TYPE.getType());
-    }
-
-    @Override
-    public ConfigurationSerializable deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        return deserializeFromMap(jsonDeserializationContext.deserialize(jsonElement, MAP_TYPE.getType()));
-    }
-
     static Map<String, Object> serializeToMap(ConfigurationSerializable serializable) {
         Map<String, Object> map = new HashMap<>(serializable.serialize());
         map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
@@ -67,5 +57,15 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
                 }
             }
         }
+    }
+
+    @Override
+    public JsonElement serialize(ConfigurationSerializable configurationSerializable, Type type, JsonSerializationContext jsonSerializationContext) {
+        return jsonSerializationContext.serialize(serializeToMap(configurationSerializable), MAP_TYPE.getType());
+    }
+
+    @Override
+    public ConfigurationSerializable deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        return deserializeFromMap(jsonDeserializationContext.deserialize(jsonElement, MAP_TYPE.getType()));
     }
 }

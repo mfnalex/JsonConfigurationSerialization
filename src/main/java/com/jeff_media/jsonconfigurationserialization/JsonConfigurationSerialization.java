@@ -1,13 +1,10 @@
 package com.jeff_media.jsonconfigurationserialization;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializer;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Utility class for serializing and deserializing ConfigurationSerializables to and from Json
@@ -36,7 +33,6 @@ public final class JsonConfigurationSerialization {
     }
 
 
-
     /**
      * Deserializes a ConfigurationSerializable from a Json String
      *
@@ -60,9 +56,6 @@ public final class JsonConfigurationSerialization {
     public static <T extends ConfigurationSerializable> T deserialize(String json, Class<T> clazz) throws IllegalArgumentException, ClassCastException {
         return GSON.fromJson(json, clazz);
     }
-
-
-
 
 
 }
