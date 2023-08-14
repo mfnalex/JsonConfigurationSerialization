@@ -1,7 +1,7 @@
 # JSON Serializer/Deserializer for Spigot's ConfigurationSerializable
 <!--- Buttons start -->
 <p align="center">
-  <a href="https://repo.jeff-media.com/javadoc/public/com/jeff-media/json-configuration-serialization/1.1">
+  <a href="https://hub.jeff-media.com/javadocs/com/jeff-media/json-configuration-serialization/1.1">
     <img src="https://static.jeff-media.com/img/button_javadocs.png?3" alt="Javadocs">
   </a>
   <a href="https://discord.jeff-media.com/">
