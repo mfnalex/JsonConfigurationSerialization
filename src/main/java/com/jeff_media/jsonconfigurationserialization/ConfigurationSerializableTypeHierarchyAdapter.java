@@ -74,16 +74,15 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
 
     private static Number narrowNumberType(Number number) {
         double asDouble = number.doubleValue();
-        int asInt = number.intValue();
         long asLong = number.longValue();
 
         double longAsDouble = asLong;
 
         if(asDouble == longAsDouble) {
-            if(asLong > Integer.MAX_VALUE) {
+            if(asLong > Integer.MAX_VALUE || asLong < Integer.MIN_VALUE) {
                 return asLong;
             } else {
-                return asInt;
+                return number.intValue();
             }
         }
 
