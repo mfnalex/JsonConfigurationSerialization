@@ -15,7 +15,10 @@ public final class JsonConfigurationSerialization {
      * A {@link JsonSerializer} and {@link JsonDeserializer} for {@link ConfigurationSerializable}s to be used with {@link GsonBuilder#registerTypeHierarchyAdapter(Class, Object)}
      */
     public static final ConfigurationSerializableTypeHierarchyAdapter TYPE_HIERARCHY_ADAPTER = new ConfigurationSerializableTypeHierarchyAdapter();
-    private static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(ConfigurationSerializable.class, TYPE_HIERARCHY_ADAPTER).create();
+
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeHierarchyAdapter(ConfigurationSerializable.class, TYPE_HIERARCHY_ADAPTER)
+            .create();
 
 
     private JsonConfigurationSerialization() {

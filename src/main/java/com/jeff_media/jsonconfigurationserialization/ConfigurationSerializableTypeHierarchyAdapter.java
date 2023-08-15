@@ -61,18 +61,33 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
                 }
             } else {
                 // Gson is pretty stupid and deserializes all numbers as doubles, so we need to convert them back to ints if possible.
-                // Otherwise, certain deserialization methods will not work, for example CraftMetaItem#buildEnchantments does an instanceof Integer check
+                // Otherwise, certain deserialization methods will not work, for example CraftMetaItem#buildEnchantments does an instanceof Integer check.
+                // And no, we cannot use a custom ToNumberStrategy because Gson is stupid and does not allow us to specify a ToNumberStrategy for a specific type.
                 if(raw instanceof Number) {
                     Number number = (Number) raw;
-                    double asDouble = number.doubleValue();
-                    int asInt = number.intValue();
-                    double intAsDouble = asInt;
-                    if(asDouble == intAsDouble) {
-                        entry.setValue(asInt);
-                    }
+                    entry.setValue(narrowNumberType(number));
                 }
             }
         }
+    }
+
+
+    private static Number narrowNumberType(Number number) {
+        double asDouble = number.doubleValue();
+        int asInt = number.intValue();
+        long asLong = number.longValue();
+
+        double longAsDouble = asLong;
+
+        if(asDouble == longAsDouble) {
+            if(asLong > Integer.MAX_VALUE) {
+                return asLong;
+            } else {
+                return asInt;
+            }
+        }
+
+        return asDouble;
     }
 
     @Override
